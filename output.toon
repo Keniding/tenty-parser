@@ -1,0 +1,12 @@
+user:
+  name: "John Doe"
+  age: 30
+  email: john@example.com
+  active: true
+  tags[3]: developer, python, rust
+  address:
+    street: "123 Main St"
+    city: "New York"
+    zipcode: 10001
+posts[1]{id,title,published}:
+  1,"Hello World",true
