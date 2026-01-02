@@ -1,9 +1,42 @@
 [project]
 name = "tenty-parser"
 version = "0.1.0"
+description = "Modern CLI tool to parse, transform and convert between JSON, YAML and TOON formats"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Custom License - See LICENSE file"}
+authors = [
+    {name = "Keniding", email = "kenidingh@gmail.com"}
+]
+keywords = ["parser", "json", "yaml", "toon", "cli", "converter", "schema"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
 dependencies = [
     "pydantic>=2.12.5",
     "pyyaml>=6.0.3",
-    "typer>=0.21.0",  # Para CLI
-    "rich>=14.2.0",  # Para output bonito
+    "typer>=0.21.0",
+    "rich>=14.2.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Keniding/tenty-parser"
+Repository = "https://github.com/Keniding/tenty-parser"
+Issues = "https://github.com/Keniding/tenty-parser/issues"
+
+[project.scripts]
+tenty = "src.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
