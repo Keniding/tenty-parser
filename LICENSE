@@ -1,0 +1,80 @@
+Tenty Parser License
+
+Copyright (c) 2026 Keniding
+
+TÉRMINOS Y CONDICIONES
+
+1. DEFINICIONES
+   - "Software" se refiere al proyecto Tenty Parser y todo su código fuente.
+   - "Uso Personal" se refiere al uso no comercial del Software.
+   - "Uso Comercial" se refiere a cualquier uso del Software con fines lucrativos.
+
+2. PERMISOS PARA USO PERSONAL Y NO COMERCIAL
+
+   Se concede permiso, de forma gratuita, a cualquier persona que obtenga una copia
+   de este Software, para usar, copiar, modificar y distribuir el Software para
+   fines NO COMERCIALES, sujeto a las siguientes condiciones:
+
+   a) Se debe mantener el aviso de copyright y esta licencia en todas las copias.
+   b) Se debe dar crédito explícito al autor original (Keniding) en cualquier
+      proyecto derivado o que utilice este Software.
+   c) Cualquier modificación debe ser claramente indicada y documentada.
+
+3. USO COMERCIAL
+
+   El uso comercial de este Software requiere:
+
+   a) Autorización explícita por escrito del autor (Keniding).
+   b) Un acuerdo de licencia comercial que puede incluir:
+      - Compensación económica acordada
+      - Reconocimiento público del autor
+      - Contribuciones al proyecto original
+   
+   Para solicitar una licencia comercial, contactar a:
+   - GitHub: https://github.com/Keniding
+   - Repositorio: https://github.com/Keniding/tenty-parser
+   - Email: kenidingh@gmail.com
+
+4. RECONOCIMIENTO OBLIGATORIO
+
+   En CUALQUIER uso del Software (comercial o no comercial), se debe:
+
+   a) Incluir una atribución visible que indique:
+      "Powered by Tenty Parser - Created by Keniding"
+      o equivalente en la documentación y/o interfaz del proyecto.
+   
+   b) Enlazar al repositorio original cuando sea técnicamente posible:
+      https://github.com/Keniding/tenty-parser
+
+5. CONTRIBUCIONES
+
+   Las contribuciones al proyecto son bienvenidas y se consideran como donaciones
+   al proyecto bajo los mismos términos de esta licencia, manteniendo el copyright
+   del autor original.
+
+6. RESTRICCIONES
+
+   NO está permitido:
+   - Usar el Software con fines comerciales sin autorización
+   - Eliminar o modificar los avisos de copyright
+   - Reclamar autoría del Software original
+   - Sublicenciar el Software bajo términos diferentes
+
+7. GARANTÍA
+
+   EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
+   IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE COMERCIABILIDAD, IDONEIDAD
+   PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS AUTORES O
+   TITULARES DEL COPYRIGHT SERÁN RESPONSABLES DE NINGUNA RECLAMACIÓN, DAÑOS U OTRAS
+   RESPONSABILIDADES, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O CUALQUIER OTRO
+   MOTIVO, QUE SURJA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN
+   EL SOFTWARE.
+
+8. TERMINACIÓN
+
+   Esta licencia se termina automáticamente si se violan cualquiera de sus términos.
+   Al terminar, debe cesar todo uso del Software y destruir todas las copias.
+
+---
+
+Para más información, visite: https://github.com/Keniding/tenty-parser
