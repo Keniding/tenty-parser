@@ -64,7 +64,7 @@ def parse(
         console.print(syntax)
 
         if output:
-            with open(output, 'w') as f:
+            with open(output, 'w', encoding='utf-8') as f:
                 json.dump(simple, f, indent=2)
             console.print(f"[green]✓[/green] Saved to {output}")
 
@@ -74,12 +74,13 @@ def parse(
         console.print(syntax)
 
         if output:
-            with open(output, 'w') as f:
+            with open(output, 'w', encoding='utf-8') as f:
                 json.dump(schema, f, indent=2)
             console.print(f"[green]✓[/green] Saved to {output}")
 
     elif format == "toon":
-        with open(file, 'r', encoding='utf-8') as f:
+        # utf-8-sig para manejar BOM
+        with open(file, 'r', encoding='utf-8-sig') as f:
             if file_ext in ['.yaml', '.yml']:
                 import yaml
                 data = yaml.safe_load(f)
@@ -139,7 +140,8 @@ def convert(
     # Leer archivo de entrada
     try:
         file_ext = input_file.suffix.lower()
-        with open(input_file, 'r', encoding='utf-8') as f:
+        # utf-8-sig para manejar BOM
+        with open(input_file, 'r', encoding='utf-8-sig') as f:
             if file_ext in ['.yaml', '.yml']:
                 import yaml
                 data = yaml.safe_load(f)
@@ -223,7 +225,7 @@ def schema(
 @app.command()
 def version():
     """Show version information"""
-    console.print("[cyan]tenty-parser[/cyan] version [green]0.1.0[/green]")
+    console.print("[cyan]tenty-parser[/cyan] version [green]0.1.1[/green]")
 
 
 if __name__ == "__main__":

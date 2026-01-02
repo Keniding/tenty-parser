@@ -17,6 +17,7 @@ class YAMLParser:
     @staticmethod
     def parse_file(filepath: str) -> DocumentStructure:
         """Parse YAML file a DocumentStructure"""
-        with open(filepath, 'r', encoding='utf-8') as f:
+        # utf-8-sig para manejar BOM en Windows
+        with open(filepath, 'r', encoding='utf-8-sig') as f:
             content = f.read()
         return YAMLParser.parse(content)

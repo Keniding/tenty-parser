@@ -20,7 +20,8 @@ class TOONParser:
     @staticmethod
     def parse_file(filepath: str) -> DocumentStructure:
         """Parse TOON file a DocumentStructure"""
-        with open(filepath, 'r', encoding='utf-8') as f:
+        # utf-8-sig para manejar BOM en Windows
+        with open(filepath, 'r', encoding='utf-8-sig') as f:
             content = f.read()
         return TOONParser.parse(content)
 
