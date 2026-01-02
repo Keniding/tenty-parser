@@ -1,0 +1,21 @@
+{
+  "user": {
+    "name": "John Doe",
+    "age": 30,
+    "email": "john@example.com",
+    "active": true,
+    "tags": ["developer", "python", "rust"],
+    "address": {
+      "street": "123 Main St",
+      "city": "New York",
+      "zipcode": 10001
+    }
+  },
+  "posts": [
+    {
+      "id": 1,
+      "title": "Hello World",
+      "published": true
+    }
+  ]
+}
