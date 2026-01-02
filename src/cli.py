@@ -9,6 +9,8 @@ from .parsers.json_parser import JSONParser
 from .transformers.to_structure import StructureTransformer
 from .parsers.yaml_parser import YAMLParser
 from .transformers.to_toon import TOONTransformer
+from .parsers.toon_parser import TOONParser
+from .transformers.to_schema import SchemaTransformer
 
 app = typer.Typer(
     name="tenty-parser",
@@ -42,6 +44,8 @@ def parse(
             structure = YAMLParser.parse_file(str(file))
         elif file_ext == '.json':
             structure = JSONParser.parse_file(str(file))
+        elif file_ext == '.toon':
+            structure = TOONParser.parse_file(str(file))
         else:
             console.print(f"[yellow]Warning:[/yellow] Unknown extension, trying JSON parser")
             structure = JSONParser.parse_file(str(file))
@@ -164,6 +168,57 @@ def convert(
     except Exception as e:
         console.print(f"[red]Error writing file:[/red] {e}")
         raise typer.Exit(1)
+
+
+@app.command()
+def schema(
+        file: Path = typer.Argument(..., help="Input file to generate schema from"),
+        output: Path = typer.Option(None, "--output", "-o", help="Output file (optional)"),
+        title: str = typer.Option("Generated Schema", "--title", "-t", help="Schema title"),
+        format: str = typer.Option("jsonschema", "--format", "-f", help="Schema format: jsonschema, openapi")
+):
+    """
+    Generate JSON Schema or OpenAPI Schema from a file
+    """
+    if not file.exists():
+        console.print(f"[red]Error:[/red] File '{file}' not found")
+        raise typer.Exit(1)
+
+    console.print(f"[cyan]Generating schema from:[/cyan] {file}")
+
+    # Parse file
+    file_ext = file.suffix.lower()
+    try:
+        if file_ext in ['.yaml', '.yml']:
+            structure = YAMLParser.parse_file(str(file))
+        elif file_ext == '.json':
+            structure = JSONParser.parse_file(str(file))
+        elif file_ext == '.toon':
+            structure = TOONParser.parse_file(str(file))
+        else:
+            structure = JSONParser.parse_file(str(file))
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+
+    # Generate schema
+    if format == "jsonschema":
+        schema = SchemaTransformer.to_json_schema(structure, title)
+    elif format == "openapi":
+        schema = SchemaTransformer.to_openapi_schema(structure, title)
+    else:
+        console.print(f"[red]Error:[/red] Unknown format '{format}'")
+        raise typer.Exit(1)
+
+    # Display
+    syntax = Syntax(json.dumps(schema, indent=2), "json", theme="monokai")
+    console.print(syntax)
+
+    # Save
+    if output:
+        with open(output, 'w', encoding='utf-8') as f:
+            json.dump(schema, f, indent=2)
+        console.print(f"[green]✓[/green] Saved to {output}")
 
 @app.command()
 def version():

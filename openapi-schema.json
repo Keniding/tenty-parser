@@ -1,0 +1,93 @@
+{
+  "title": "Generated Schema",
+  "type": "object",
+  "properties": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "examples": [
+            "John Doe"
+          ]
+        },
+        "age": {
+          "type": "integer",
+          "examples": [
+            30
+          ]
+        },
+        "email": {
+          "type": "string",
+          "examples": [
+            "john@example.com"
+          ]
+        },
+        "active": {
+          "type": "boolean",
+          "examples": [
+            true
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "examples": [
+              "developer"
+            ]
+          }
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "street": {
+              "type": "string",
+              "examples": [
+                "123 Main St"
+              ]
+            },
+            "city": {
+              "type": "string",
+              "examples": [
+                "New York"
+              ]
+            },
+            "zipcode": {
+              "type": "integer",
+              "examples": [
+                10001
+              ]
+            }
+          }
+        }
+      }
+    },
+    "posts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "examples": [
+              1
+            ]
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "Hello World"
+            ]
+          },
+          "published": {
+            "type": "boolean",
+            "examples": [
+              true
+            ]
+          }
+        }
+      }
+    }
+  }
+}
