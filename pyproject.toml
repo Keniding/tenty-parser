@@ -1,6 +1,6 @@
 [project]
 name = "tenty-parser"
-version = "0.1.2"
+dynamic = ["version"]
 description = "Modern CLI tool to parse, transform and convert between JSON, YAML and TOON formats"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -35,8 +35,14 @@ Issues = "https://github.com/Keniding/tenty-parser/issues"
 tenty = "src.cli:app"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]

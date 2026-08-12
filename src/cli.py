@@ -1,5 +1,6 @@
 import typer
 import json
+from importlib.metadata import version as get_version, PackageNotFoundError
 from pathlib import Path
 from rich.console import Console
 from rich.syntax import Syntax
@@ -225,7 +226,11 @@ def schema(
 @app.command()
 def version():
     """Show version information"""
-    console.print("[cyan]tenty-parser[/cyan] version [green]0.1.1[/green]")
+    try:
+        pkg_version = get_version("tenty-parser")
+    except PackageNotFoundError:
+        pkg_version = "unknown (not installed)"
+    console.print(f"[cyan]tenty-parser[/cyan] version [green]{pkg_version}[/green]")
 
 
 if __name__ == "__main__":
