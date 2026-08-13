@@ -2,19 +2,19 @@
 
 Generated as part of a dependency-modernization pass. This document only
 *researches and recommends* — no migration was performed. See
-`src/parsers/` and `src/transformers/` for the code discussed below.
+`tenty_parser/parsers/` and `tenty_parser/transformers/` for the code discussed below.
 
 ## What was checked
 
-Scanned `src/` for modules that hand-implement something a named format or
+Scanned `tenty_parser/` for modules that hand-implement something a named format or
 well-known problem already has a library for. Two areas stood out:
 
-1. `src/parsers/toon_parser.py` + `src/transformers/to_toon.py` — a
+1. `tenty_parser/parsers/toon_parser.py` + `tenty_parser/transformers/to_toon.py` — a
    hand-rolled TOON (Token-Oriented Object Notation) decoder/encoder.
-2. `src/transformers/to_schema.py` — hand-rolled JSON Schema generation from
+2. `tenty_parser/transformers/to_schema.py` — hand-rolled JSON Schema generation from
    sample data.
 
-Everything else in `src/` (the JSON/YAML parsing, the Typer CLI wiring, the
+Everything else in `tenty_parser/` (the JSON/YAML parsing, the Typer CLI wiring, the
 Pydantic `StructureNode`/`DocumentStructure` models, the tree/dict
 transformers) is either a thin pass-through to `json`/`pyyaml` (already the
 standard libraries for those formats) or glue code specific to this project's
@@ -91,8 +91,8 @@ Further verified directly against the GitHub repo (not just PyPI metadata):
 The hand-written encoder/decoder was a self-admitted "basic" stand-in with
 no tests, and — once the working release was identified — there's a
 maintained, spec-org-authored, well-tested library that does strictly more.
-This migration has been carried out: see `src/parsers/toon_parser.py` and
-`src/transformers/to_toon.py`, both now thin wrappers around
+This migration has been carried out: see `tenty_parser/parsers/toon_parser.py` and
+`tenty_parser/transformers/to_toon.py`, both now thin wrappers around
 `toon_format.decode()` / `toon_format.encode()`.
 
 **What changed:**
@@ -104,16 +104,16 @@ This migration has been carried out: see `src/parsers/toon_parser.py` and
   `_array_tabular`, `_object_to_toon`, `_format_simple_value`) removed —
   `TOONTransformer.to_toon()` now calls `toon_format.encode()` directly.
 - Public API (`TOONParser.parse`, `TOONParser.parse_file`,
-  `TOONTransformer.to_toon`) unchanged, so `src/cli.py` needed no changes.
+  `TOONTransformer.to_toon`) unchanged, so `tenty_parser/cli.py` needed no changes.
 - `output.toon` regenerated from `test.json` via the new encoder as the
   up-to-date fixture; verified round-trip back to JSON matches the original
   exactly.
 - Manually smoke-tested every CLI command that touches TOON: `parse
   --format toon`, `parse <file>.toon --format json`, `schema <file>.toon`,
-  `convert <file> <file>.toon`. There is still no automated test suite —
-  per the earlier scope note, adding one for this code now (rather than
-  after settling on a library) was the right order of operations, and is a
-  natural next step.
+  `convert <file> <file>.toon`. An automated pytest suite was added right
+  after this migration (see [testing.md](./testing.md)) — waiting until the
+  library was settled before writing tests against this code was the right
+  order of operations, rather than testing the hand-written version first.
 
 ## Candidate 2: hand-written JSON Schema generation from sample data
 
@@ -145,5 +145,5 @@ isn't a self-admitted gap here to close.
 
 | Candidate | Verdict | Library |
 |---|---|---|
-| TOON parser/serializer (`src/parsers/toon_parser.py`, `src/transformers/to_toon.py`) | **Migrated** | [`toon-format`](https://pypi.org/project/toon-format/) pinned to `>=0.9.0b1,<1.0.0` (the only functional release; `0.1.0` is a non-functional placeholder) |
-| JSON Schema generation (`src/transformers/to_schema.py`) | Keep hand-written | n/a (`genson` considered, not a fit) |
+| TOON parser/serializer (`tenty_parser/parsers/toon_parser.py`, `tenty_parser/transformers/to_toon.py`) | **Migrated** | [`toon-format`](https://pypi.org/project/toon-format/) pinned to `>=0.9.0b1,<1.0.0` (the only functional release; `0.1.0` is a non-functional placeholder) |
+| JSON Schema generation (`tenty_parser/transformers/to_schema.py`) | Keep hand-written | n/a (`genson` considered, not a fit) |

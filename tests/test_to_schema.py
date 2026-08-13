@@ -1,5 +1,5 @@
-from src.models.structure import DocumentStructure, StructureNode
-from src.transformers.to_schema import SchemaTransformer
+from tenty_parser.models.structure import DocumentStructure, StructureNode
+from tenty_parser.transformers.to_schema import SchemaTransformer
 
 
 def _doc(root):

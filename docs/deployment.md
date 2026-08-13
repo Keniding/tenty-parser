@@ -16,7 +16,7 @@ The version is not stored as a static string anywhere in the codebase. `pyprojec
 - Building exactly on a tag `vX.Y.Z` produces version `X.Y.Z`.
 - Building on a commit that is ahead of the last tag produces `X.Y.Z.devN`, where `N` is the number of commits since that tag (the `local_scheme = "no-local-version"` setting drops the `+gHASH` suffix that PyPI would otherwise reject).
 
-At runtime, `src/__init__.py` and the `tenty version` command both read the installed package's version via `importlib.metadata`, so there is nothing to keep in sync by hand.
+At runtime, `tenty_parser/__init__.py` and the `tenty version` command both read the installed package's version via `importlib.metadata`, so there is nothing to keep in sync by hand.
 
 Because of this, both workflows check out full git history (`fetch-depth: 0`) instead of the default shallow clone — a shallow clone has no tags, and `hatch-vcs` would be unable to compute a version.
 
@@ -82,4 +82,4 @@ No file in the repository needs to be edited as part of this process.
 
 ## Superseded manual scripts
 
-`deploy.sh` and `deploy.ps1` previously handled building and uploading by hand, including editing a static `version = "..."` field in `pyproject.toml` and regenerating `src/__init__.py`. They were removed once the version became dynamic (`dynamic = ["version"]` has no static field left to edit) and the GitHub Actions workflows took over both build and upload.
+`deploy.sh` and `deploy.ps1` previously handled building and uploading by hand, including editing a static `version = "..."` field in `pyproject.toml` and regenerating `tenty_parser/__init__.py`. They were removed once the version became dynamic (`dynamic = ["version"]` has no static field left to edit) and the GitHub Actions workflows took over both build and upload.

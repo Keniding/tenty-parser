@@ -6,25 +6,25 @@ Tenty Parser is a CLI built with Typer that reads structured data (JSON, YAML, T
 
 ```mermaid
 flowchart LR
-    subgraph CLI["src/cli.py"]
+    subgraph CLI["tenty_parser/cli.py"]
         parse[parse command]
         convert[convert command]
         schema[schema command]
         version[version command]
     end
 
-    subgraph Parsers["src/parsers"]
+    subgraph Parsers["tenty_parser/parsers"]
         JSONParser
         YAMLParser
         TOONParser
     end
 
-    subgraph Models["src/models"]
+    subgraph Models["tenty_parser/models"]
         StructureNode
         DocumentStructure
     end
 
-    subgraph Transformers["src/transformers"]
+    subgraph Transformers["tenty_parser/transformers"]
         StructureTransformer
         TOONTransformer
         SchemaTransformer
@@ -48,11 +48,11 @@ flowchart LR
     convert --> TOONTransformer
 ```
 
-- **Parsers** (`src/parsers/`) read a file of a given format and build a `DocumentStructure`, a tree of `StructureNode` (`src/models/structure.py`) describing types, examples, and nesting.
-- **Transformers** (`src/transformers/`) take that structure (or, for TOON, raw data) and produce an output representation: a plain dict, a JSON-Schema-like dict, a JSON Schema, an OpenAPI Schema, or a TOON string.
+- **Parsers** (`tenty_parser/parsers/`) read a file of a given format and build a `DocumentStructure`, a tree of `StructureNode` (`tenty_parser/models/structure.py`) describing types, examples, and nesting.
+- **Transformers** (`tenty_parser/transformers/`) take that structure (or, for TOON, raw data) and produce an output representation: a plain dict, a JSON-Schema-like dict, a JSON Schema, an OpenAPI Schema, or a TOON string.
 - **`cli.py`** wires Typer commands to the parser/transformer combination each command needs, and handles file I/O and console output (via Rich).
 
-`convert` does not go through the `DocumentStructure` model at all — it reads the source file into a plain Python object (`json.load` / `yaml.safe_load`) and writes it back out in the target format directly, which is why it supports JSON/YAML/TOON but does not need a parser class for JSON or YAML source files.
+`convert` does not go through the `DocumentStructure` model at all — it reads the source file into a plain Python value via a shared `_read_data()` helper in `cli.py` and writes it back out in the target format directly. `_read_data()` dispatches on file extension (`.yaml`/`.yml` -> `yaml.safe_load`, `.toon` -> `toon_format.decode`, else `json.load`) and is also what `parse`'s `--format toon` branch uses, so both entry points support JSON, YAML, and TOON as input without a parser class for JSON or YAML source files.
 
 ## Commands
 
@@ -73,7 +73,7 @@ flowchart TD
     G -->|tree, default| H[Rich Tree in terminal]
     G -->|json| I[StructureTransformer.to_simple_dict]
     G -->|schema| J[StructureTransformer.to_schema_like]
-    G -->|toon| K[TOONTransformer.to_toon on raw data]
+    G -->|toon| K[_read_data then TOONTransformer.to_toon]
     I --> L[optional: write to --output]
     J --> L
     K --> L
@@ -83,7 +83,7 @@ An unrecognized extension falls back to the JSON parser with a warning rather th
 
 ### `tenty convert <input> <output> --to <format>`
 
-Reads the input file (JSON or YAML) into a plain Python object and writes it back out as JSON, YAML, or TOON, based on `--to`. This is a direct format-to-format conversion, independent of the `DocumentStructure` model used by `parse` and `schema`.
+Reads the input file (JSON, YAML, or TOON — via `_read_data()`) into a plain Python object and writes it back out as JSON, YAML, or TOON, based on `--to`. This is a direct format-to-format conversion, independent of the `DocumentStructure` model used by `parse` and `schema`.
 
 ### `tenty schema <file> --format <jsonschema|openapi>`
 

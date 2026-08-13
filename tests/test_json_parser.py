@@ -1,6 +1,6 @@
 import json
 
-from src.parsers.json_parser import JSONParser
+from tenty_parser.parsers.json_parser import JSONParser
 
 
 def test_parse_returns_document_structure(sample_data):

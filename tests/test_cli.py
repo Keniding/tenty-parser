@@ -2,7 +2,7 @@ import json
 
 from typer.testing import CliRunner
 
-from src.cli import app
+from tenty_parser.cli import app
 
 runner = CliRunner()
 
@@ -219,7 +219,7 @@ def test_version_command_reports_installed_version():
 
 
 def test_version_command_falls_back_when_package_not_found(monkeypatch):
-    import src.cli as cli_module
+    import tenty_parser.cli as cli_module
     from importlib.metadata import PackageNotFoundError
 
     def raise_not_found(_name):

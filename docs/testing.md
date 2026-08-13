@@ -1,14 +1,14 @@
 # Testing
 
-An automated suite now lives in `tests/` (pytest + pytest-cov, 77 tests, 100% statement coverage on `src/`). Run it with:
+An automated suite now lives in `tests/` (pytest + pytest-cov, 77 tests, 100% statement coverage on `tenty_parser/`). Run it with:
 
 ```
-uv run pytest --cov=src --cov-report=term-missing
+uv run pytest --cov=tenty_parser --cov-report=term-missing
 ```
 
 `pyproject.toml` sets `[tool.coverage.report] fail_under = 90` — `pytest --cov` fails the run if coverage drops below 90%, so a regression in coverage is a build failure, not something to notice later.
 
-This document is the older, complementary record of what each command actually produces end-to-end, captured from real runs against the fixture `test.json`. The automated suite is what actually guards against regressions now; keep this doc for the cases that are easier to read as "here's the literal output" than as an assertion — e.g. checking the exact TOON formatting or a full tree render by eye. Re-run these by hand after any change to `src/parsers/`, `src/transformers/`, or `src/cli.py`, and update the outputs here if they change intentionally.
+This document is the older, complementary record of what each command actually produces end-to-end, captured from real runs against the fixture `test.json`. The automated suite is what actually guards against regressions now; keep this doc for the cases that are easier to read as "here's the literal output" than as an assertion — e.g. checking the exact TOON formatting or a full tree render by eye. Re-run these by hand after any change to `tenty_parser/parsers/`, `tenty_parser/transformers/`, or `tenty_parser/cli.py`, and update the outputs here if they change intentionally.
 
 Fixture used throughout (`test.json`):
 
@@ -177,7 +177,7 @@ user:
 
 (`yaml.dump(..., default_flow_style=False)` alphabetizes keys and does not preserve the original field order — expected `PyYAML` behavior, not a bug.) Converting that file back with `convert out.yaml out2.json --to json` reproduces data equal to the original `test.json` when compared as parsed Python objects (key order aside, which JSON equality ignores).
 
-Note: `convert` does not accept `.toon` as an *input* format — its format dispatch only branches on `.yaml`/`.yml` vs. everything else (assumed JSON). Converting from a `.toon` source needs `parse <file>.toon --format json` (or `yaml`/`toon`) instead. This is a pre-existing gap in `convert`'s dispatch, unrelated to the TOON library migration — worth fixing separately if TOON-as-`convert`-source turns out to matter in practice.
+`convert` now also accepts `.toon` as an *input* format directly (`convert data.toon out.json --to json`) — both `convert` and `parse`'s `--format toon` path share a single `_read_data()` helper that dispatches on extension (`.yaml`/`.yml`, `.toon`, else JSON), fixing an earlier gap where `.toon` input silently got misread as JSON.
 
 ## `schema --format jsonschema`
 
@@ -266,7 +266,7 @@ Exit code 1. The second "Error writing file" line is a side effect of `convert`'
 
 ## BOM handling
 
-Both JSON and TOON source files are read with `encoding='utf-8-sig'` in the relevant paths (`parse`'s `--format toon` branch, `convert`, and `TOONParser.parse_file`), so a UTF-8 byte-order-mark prefix (common from Windows editors) is stripped transparently. Confirmed by prefixing both `test.json` and `output.toon` with `\xef\xbb\xbf` and re-running `parse` against each — both parse identically to the non-BOM originals. `JSONParser`/`YAMLParser`'s other entry points were not all re-audited for BOM handling here; if a BOM-related bug surfaces on a *plain* (non-toon, non-`convert`) JSON parse path, check `src/parsers/json_parser.py` directly.
+Both JSON and TOON source files are read with `encoding='utf-8-sig'` in the relevant paths (`parse`'s `--format toon` branch, `convert`, and `TOONParser.parse_file`), so a UTF-8 byte-order-mark prefix (common from Windows editors) is stripped transparently. Confirmed by prefixing both `test.json` and `output.toon` with `\xef\xbb\xbf` and re-running `parse` against each — both parse identically to the non-BOM originals. `JSONParser`/`YAMLParser`'s other entry points were not all re-audited for BOM handling here; if a BOM-related bug surfaces on a *plain* (non-toon, non-`convert`) JSON parse path, check `tenty_parser/parsers/json_parser.py` directly.
 
 ## Build and dependency consistency
 

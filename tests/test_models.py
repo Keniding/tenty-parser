@@ -1,4 +1,4 @@
-from src.models.structure import DocumentStructure, StructureNode
+from tenty_parser.models.structure import DocumentStructure, StructureNode
 
 
 def test_structure_node_defaults():

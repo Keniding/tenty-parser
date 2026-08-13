@@ -1,4 +1,4 @@
-from src.parsers.yaml_parser import YAMLParser
+from tenty_parser.parsers.yaml_parser import YAMLParser
 
 
 def test_parse_returns_document_structure(sample_data):

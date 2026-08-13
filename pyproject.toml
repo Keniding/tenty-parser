@@ -33,7 +33,7 @@ Repository = "https://github.com/Keniding/tenty-parser"
 Issues = "https://github.com/Keniding/tenty-parser/issues"
 
 [project.scripts]
-tenty = "src.cli:app"
+tenty = "tenty_parser.cli:app"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
@@ -46,13 +46,13 @@ source = "vcs"
 local_scheme = "no-local-version"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["tenty_parser"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.coverage.run]
-source = ["src"]
+source = ["tenty_parser"]
 
 [tool.coverage.report]
 fail_under = 90

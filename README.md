@@ -20,39 +20,20 @@
 ### Requisitos previos
 
 - Python 3.12+
-- [uv](https://github.com/astral-sh/uv) (recomendado) o pip
 
-### Con uv (recomendado)
-
-```bash
-# Clonar el repositorio
-git clone https://github.com/Keniding/tenty-parser.git
-cd tenty-parser
-
-# Instalar dependencias
-uv sync
-
-# Ejecutar
-uv run python -m src.cli --help
-```
-
-### Con pip
+### Con pip (uso normal)
 
 ```bash
-# Clonar el repositorio
-git clone https://github.com/Keniding/tenty-parser.git
-cd tenty-parser
-
-# Crear entorno virtual
-python -m venv .venv
-source .venv/bin/activate  # En Windows: .venv\Scripts\activate
-
-# Instalar dependencias
-pip install -e .
-
-# Ejecutar
-python -m src.cli --help
+pip install tenty-parser
 ```
+
+Esto deja disponible el comando `tenty` directamente en tu shell — no hace falta clonar el repositorio ni usar `python -m` para nada:
+
+```bash
+tenty --help
+```
+
+Si estás desarrollando el proyecto en sí (no solo usándolo), ve a [Desarrollo](#-desarrollo) más abajo para instalar desde el código fuente con `uv`.
 
 ## 🚀 Uso
 
@@ -62,54 +43,54 @@ python -m src.cli --help
 
 ```bash
 # Visualizar estructura en árbol
-uv run python -m src.cli parse data.json
+tenty parse data.json
 
 # Mostrar como JSON estructurado
-uv run python -m src.cli parse data.json --format json
+tenty parse data.json --format json
 
 # Generar schema
-uv run python -m src.cli parse data.json --format schema
+tenty parse data.json --format schema
 
 # Convertir a TOON
-uv run python -m src.cli parse data.json --format toon
+tenty parse data.json --format toon
 
 # Guardar resultado
-uv run python -m src.cli parse data.json --format toon -o output.toon
+tenty parse data.json --format toon -o output.toon
 ```
 
 #### 2. Convert - Convertir entre formatos
 
 ```bash
 # JSON a TOON
-uv run python -m src.cli convert input.json output.toon --to toon
+tenty convert input.json output.toon --to toon
 
 # YAML a JSON
-uv run python -m src.cli convert config.yaml config.json --to json
+tenty convert config.yaml config.json --to json
 
 # JSON a YAML
-uv run python -m src.cli convert data.json data.yaml --to yaml
+tenty convert data.json data.yaml --to yaml
 
 # TOON a JSON
-uv run python -m src.cli convert data.toon data.json --to json
+tenty convert data.toon data.json --to json
 ```
 
 #### 3. Schema - Generar schemas
 
 ```bash
 # Generar JSON Schema
-uv run python -m src.cli schema data.json -o schema.json
+tenty schema data.json -o schema.json
 
 # Generar OpenAPI Schema
-uv run python -m src.cli schema data.json --format openapi -o openapi.json
+tenty schema data.json --format openapi -o openapi.json
 
 # Con título personalizado
-uv run python -m src.cli schema data.json --title "User API Schema"
+tenty schema data.json --title "User API Schema"
 ```
 
 #### 4. Version - Ver versión
 
 ```bash
-uv run python -m src.cli version
+tenty version
 ```
 
 ## 📖 Formato TOON
@@ -159,7 +140,7 @@ posts[1]{id,title,published}:
 
 ```
 tenty-parser/
-├── src/
+├── tenty_parser/
 │   ├── models/
 │   │   └── structure.py          # Modelos Pydantic
 │   ├── parsers/
@@ -171,10 +152,12 @@ tenty-parser/
 │   │   ├── to_toon.py           # Transformador a TOON
 │   │   └── to_schema.py         # Generador de schemas
 │   └── cli.py                    # Interfaz CLI
-├── tests/                        # Tests (próximamente)
+├── tests/                        # Suite de tests (pytest, cobertura mínima 90%)
 ├── docs/
 │   ├── functionality.md          # Arquitectura y comandos del CLI
-│   └── deployment.md             # Flujo de release y publicación a PyPI
+│   ├── deployment.md             # Flujo de release y publicación a PyPI
+│   ├── dependency-research.md    # Hand-written vs. librerías mantenidas
+│   └── testing.md                # Ejemplos reales de entrada/salida por comando
 ├── pyproject.toml               # Configuración del proyecto
 ├── README.md                    # Este archivo
 ├── LICENSE                      # Licencia personalizada
@@ -185,18 +168,21 @@ Documentación detallada: [docs/functionality.md](docs/functionality.md) y [docs
 
 ## 🔧 Desarrollo
 
-### Configurar entorno de desarrollo
+Si vas a modificar el código del proyecto (no solo usarlo), instala desde el código fuente con [uv](https://github.com/astral-sh/uv):
 
 ```bash
 # Clonar repositorio
 git clone https://github.com/Keniding/tenty-parser.git
 cd tenty-parser
 
-# Instalar en modo desarrollo
+# Instalar en modo desarrollo (crea el venv e instala el comando `tenty` en él)
 uv sync
 
-# Ejecutar tests (próximamente)
-uv run pytest
+# Ejecutar el CLI desde el código fuente
+uv run tenty --help
+
+# Ejecutar tests con cobertura
+uv run pytest --cov=tenty_parser --cov-report=term-missing
 ```
 
 ### Agregar nuevas características
@@ -216,39 +202,39 @@ uv run pytest
 curl https://api.example.com/users > users.json
 
 # Visualizar estructura
-uv run python -m src.cli parse users.json
+tenty parse users.json
 
 # Generar schema para documentación
-uv run python -m src.cli schema users.json -o users-schema.json
+tenty schema users.json -o users-schema.json
 
 # Convertir a TOON para usar con LLMs
-uv run python -m src.cli convert users.json users.toon --to toon
+tenty convert users.json users.toon --to toon
 ```
 
 ### Ejemplo 2: Convertir configuración
 
 ```bash
 # Convertir YAML a JSON
-uv run python -m src.cli convert config.yaml config.json --to json
+tenty convert config.yaml config.json --to json
 
 # Ver estructura
-uv run python -m src.cli parse config.json --format tree
+tenty parse config.json --format tree
 ```
 
 ### Ejemplo 3: Workflow completo
 
 ```bash
 # 1. Parse archivo original
-uv run python -m src.cli parse data.json --format tree
+tenty parse data.json --format tree
 
 # 2. Generar schema
-uv run python -m src.cli schema data.json -o schema.json
+tenty schema data.json -o schema.json
 
 # 3. Convertir a TOON para LLM
-uv run python -m src.cli convert data.json data.toon --to toon
+tenty convert data.json data.toon --to toon
 
 # 4. Convertir de vuelta a JSON
-uv run python -m src.cli convert data.toon data-restored.json --to json
+tenty convert data.toon data-restored.json --to json
 ```
 
 ## 🎯 Casos de uso

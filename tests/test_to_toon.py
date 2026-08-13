@@ -1,6 +1,6 @@
 import toon_format
 
-from src.transformers.to_toon import TOONTransformer
+from tenty_parser.transformers.to_toon import TOONTransformer
 
 
 def test_to_toon_matches_library_default_indent(sample_data):

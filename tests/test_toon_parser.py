@@ -1,6 +1,6 @@
 import toon_format
 
-from src.parsers.toon_parser import TOONParser
+from tenty_parser.parsers.toon_parser import TOONParser
 
 
 def test_parse_returns_document_structure(sample_data):
