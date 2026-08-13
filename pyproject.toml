@@ -20,10 +20,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "pydantic>=2.12.5",
+    "pydantic>=2.13.4",
     "pyyaml>=6.0.3",
-    "typer>=0.21.0",
-    "rich>=14.2.0",
+    "typer>=0.27.1",
+    "rich>=15.0.0",
 ]
 
 [project.urls]
