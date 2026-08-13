@@ -35,6 +35,17 @@ tenty --help
 
 Si estás desarrollando el proyecto en sí (no solo usándolo), ve a [Desarrollo](#-desarrollo) más abajo para instalar desde el código fuente con `uv`.
 
+> **Si instalas con `uv` en vez de `pip`, lee esto.** `tenty-parser` depende de `toon-format` (la librería que maneja el formato TOON), y a día de hoy esa librería **no tiene ninguna versión estable publicada** — solo existe como pre-release (`0.9.0b1`). Un `pip install tenty-parser` normal instala bien porque `pip` sí resuelve pre-releases cuando es la única opción disponible. Pero `uv add tenty-parser` / `uv sync` **no** lo hace por defecto: en vez de fallar con un error, se queda calladamente instalado en una versión vieja de `tenty-parser` que sí puede resolver sin pre-releases — nunca vas a enterarte de que te perdiste una actualización a menos que lo busques a propósito. Si usas `uv`, instala así:
+> ```bash
+> uv add tenty-parser --prerelease=allow
+> ```
+> o agrega esto a tu `pyproject.toml`:
+> ```toml
+> [tool.uv]
+> prerelease = "allow"
+> ```
+> Este es un problema del lado de `toon-format`, no algo que podamos arreglar desde `tenty-parser` mientras esa librería no publique una versión estable. Detalle completo en [docs/dependency-research.md](docs/dependency-research.md).
+
 ## 🚀 Uso
 
 ### Comandos principales

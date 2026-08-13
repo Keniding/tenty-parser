@@ -54,8 +54,14 @@ round-tripping this project's own `test.json` through
 against the original, byte-for-byte identical.
 
 Because only a pre-release version works, the pinned dependency is
-`toon-format>=0.9.0b1,<1.0.0` — an explicit pre-release floor, which `uv`
-and `pip` both resolve without needing a global "allow pre-releases" flag.
+`toon-format>=0.9.0b1,<1.0.0` — an explicit pre-release floor. Within
+*this* project, `uv add "toon-format>=0.9.0b1,<1.0.0"` and `uv build`
+resolve it without needing a global "allow pre-releases" flag, because the
+pre-release is named explicitly in the *root* project's own dependency
+declaration. **This does not carry through to consumers of `tenty-parser`
+itself — see "Downstream impact" below, this was the wrong claim to make
+without testing it from a consumer's perspective, and it cost real
+installability.**
 
 Further verified directly against the GitHub repo (not just PyPI metadata):
 - 757 stars, last push within the last few months, 26 open issues — actively
@@ -94,6 +100,49 @@ maintained, spec-org-authored, well-tested library that does strictly more.
 This migration has been carried out: see `tenty_parser/parsers/toon_parser.py` and
 `tenty_parser/transformers/to_toon.py`, both now thin wrappers around
 `toon_format.decode()` / `toon_format.encode()`.
+
+**Downstream impact — discovered after the 0.1.3 release, not before.** A
+real user installing `tenty-parser` into a separate `uv`-managed project hit
+this directly, reported it back, and it was reproduced here in a throwaway
+`uv init` project:
+
+```
+$ uv add tenty-parser
+...
+ + tenty-parser==0.1.2
+```
+
+No error. No warning. `uv add tenty-parser` — the exact command anyone
+would run to depend on this package — silently resolves to **0.1.2**, not
+the current 0.1.3, because 0.1.3 requires a pre-release (`toon-format`) and
+uv's project-mode resolver only auto-allows a pre-release when the
+*consuming* project's own direct requirements name it explicitly. A
+transitive pre-release requirement buried inside `tenty-parser`'s own
+metadata does not qualify, so uv quietly falls back to the newest version
+of `tenty-parser` that *doesn't* need one — 0.1.2, which still has the old
+`src`-named package, the hand-written TOON parser, and the `convert`
+`.toon`-input bug this session fixed. Nobody consuming it via plain
+`uv add` would ever see 0.1.3 unless they already knew to look for it.
+
+Plain `pip install tenty-parser` (non-project, ad-hoc mode) does **not**
+have this problem — verified in a clean venv, it correctly installs 0.1.3
+along with `toon-format==0.9.0b1`, no flags needed. `pip`'s resolver applies
+the "allow a pre-release if it's the only way to satisfy the requirement"
+rule transitively; `uv`'s project resolver (`uv add`/`uv sync`) does not.
+This is a real, current gap between the two tools' default behavior, not a
+misconfiguration on either side.
+
+The fix a `uv` user needs is `uv add tenty-parser --prerelease=allow`, or
+`[tool.uv] prerelease = "allow"` in their own `pyproject.toml` — documented
+prominently in this project's README. The team decided (2026-08-13) to keep
+the `toon-format` dependency as-is and rely on that documentation rather
+than reverting the migration, accepting that most `uv` users who don't read
+the README will silently stay on 0.1.2 until `toon-format` ships a real
+stable release and this pin can drop the pre-release requirement entirely.
+Revisit this trade-off if adoption data ever suggests it's costing more
+than expected — reverting to a (now well-tested, thanks to the pytest
+suite covering whichever implementation is active) hand-written encoder is
+still on the table.
 
 **What changed:**
 - `pyproject.toml`: added `toon-format>=0.9.0b1,<1.0.0`.
