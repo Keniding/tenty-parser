@@ -172,11 +172,16 @@ tenty-parser/
 │   │   └── to_schema.py         # Generador de schemas
 │   └── cli.py                    # Interfaz CLI
 ├── tests/                        # Tests (próximamente)
+├── docs/
+│   ├── functionality.md          # Arquitectura y comandos del CLI
+│   └── deployment.md             # Flujo de release y publicación a PyPI
 ├── pyproject.toml               # Configuración del proyecto
 ├── README.md                    # Este archivo
 ├── LICENSE                      # Licencia personalizada
 └── .gitignore                   # Archivos ignorados
 ```
+
+Documentación detallada: [docs/functionality.md](docs/functionality.md) y [docs/deployment.md](docs/deployment.md).
 
 ## 🔧 Desarrollo
 
