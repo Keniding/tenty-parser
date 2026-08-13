@@ -323,8 +323,8 @@ Para más detalles, consulta el archivo [LICENSE](LICENSE).
 
 ## 🗺️ Roadmap
 
-- [ ] Tests unitarios completos
-- [ ] Parser TOON más robusto
+- [x] Tests unitarios completos
+- [x] Parser TOON más robusto
 - [ ] Soporte para más formatos (XML, TOML)
 - [ ] Validación de schemas
 - [ ] API Python para uso programático

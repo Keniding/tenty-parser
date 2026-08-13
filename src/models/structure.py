@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Any, Dict, Optional, Literal
 
 
@@ -12,8 +12,8 @@ class StructureNode(BaseModel):
     required: bool = False
     nullable: bool = False
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "type": "object",
                 "children": {
@@ -22,6 +22,7 @@ class StructureNode(BaseModel):
                 }
             }
         }
+    )
 
 
 class DocumentStructure(BaseModel):
@@ -33,8 +34,3 @@ class DocumentStructure(BaseModel):
     def to_dict(self) -> dict:
         """Convierte a diccionario simple"""
         return self.model_dump(exclude_none=True)
-
-    def to_toon(self) -> str:
-        """Convierte a formato TOON"""
-        # Implementaremos esto después
-        pass

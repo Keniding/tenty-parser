@@ -34,55 +34,86 @@ implementation; production would need a more robust parser") — this is a
 self-flagged stopgap, not a considered design decision.
 
 **Library found:** [`toon-format`](https://pypi.org/project/toon-format/)
-(PyPI, `https://toonformat.dev`, source at
-`https://github.com/toon-format/toon-python`) is the reference-implementation
-Python package published by the `toon-format` GitHub org — the same org that
-defines the TOON spec this project's docstring already links to
-(`https://github.com/toon-format/spec`).
+on PyPI, source at `https://github.com/toon-format/toon-python` — listed as
+the official Python implementation on `https://toonformat.dev`'s
+implementations page, under the same `toon-format` GitHub org that owns the
+canonical JS/TS implementation (`toon-format/toon`, the one with the full
+spec docs, benchmarks, and CLI) and the spec itself
+(`https://github.com/toon-format/spec`, currently at v4.1).
 
-- Latest stable on PyPI: `0.1.0` (2025-11-01); a `0.9.0b1` beta
-  (2025-11-08) is in flight toward a 1.0 release, so this is an actively
-  developing project, not an abandoned one.
+**Important correction from the first pass of this research:** the
+initially-recommended plain `pip install toon-format` (which resolves to
+`0.1.0`, published 2025-11-01) has `encode()`/`decode()` that both raise
+`NotImplementedError` — it is an empty placeholder release, not a working
+library, despite its docstrings showing full usage examples. This was only
+caught by actually importing and calling it, not by reading its README. The
+real, functional release is `0.9.0b1` (published 2025-11-08, still the only
+non-placeholder release on PyPI as of this writing) — confirmed working by
+round-tripping this project's own `test.json` through
+`toon_format.encode()` → `toon_format.decode()` and diffing the result
+against the original, byte-for-byte identical.
+
+Because only a pre-release version works, the pinned dependency is
+`toon-format>=0.9.0b1,<1.0.0` — an explicit pre-release floor, which `uv`
+and `pip` both resolve without needing a global "allow pre-releases" flag.
+
+Further verified directly against the GitHub repo (not just PyPI metadata):
+- 757 stars, last push within the last few months, 26 open issues — actively
+  maintained, not abandoned.
+- Its README confirms the "792 tests, 91% coverage, 85% enforced in CI"
+  claim referenced below is real (CI badge + an explicit `pytest --cov`
+  command in the README), not just marketing copy — there is no test
+  coverage at all for the hand-written TOON code today, by contrast.
+- README's own status line: *"Beta Status (v0.9.x): This library is in
+  active development and working towards spec compliance... API may change
+  before 1.0.0 release."* Its own roadmap places it in the "v0.9.x —
+  serializer improvements, spec compliance testing" stage, with v1.0.0
+  ("first stable release with full spec compliance") still ahead.
+- GitHub commit history includes a `ToonPydanticModel` /
+  `schema_to_toon()` / `from_toon()` integration (added after the 0.9.0b1
+  PyPI release, so not yet installable) — a natural fit later, since this
+  project already models everything through `StructureNode`/
+  `DocumentStructure` (Pydantic `BaseModel`s), though nothing here depends
+  on it today.
+- One packaging-hygiene gap worth tracking: PyPI hasn't seen a new release
+  since 2025-11-08 despite GitHub commits continuing well past that date —
+  worth re-checking for a newer release (ideally a proper 1.0) before this
+  pin's upper bound (`<1.0.0`) needs revisiting anyway.
 - Exposes exactly the two operations this codebase needs: `encode(value,
   options=None)` and `decode(input_str, options=None)`.
-- Covers everything the hand-written version covers (object indentation,
-  primitive arrays with length markers, tabular arrays for uniform object
-  lists, mixed/heterogeneous arrays) **plus** things the hand-written
-  version does not handle: configurable delimiters (comma/tab/pipe),
-  stricter/configurable parsing modes, and normalization of special values
-  (`Infinity`, `NaN`, `datetime`). Per its README it ships with 792 tests
-  and 91% coverage — there is no test coverage at all for the hand-written
-  TOON code today.
-- There's also an optional Pydantic integration extra, which is a natural
-  fit since this project already models everything through
-  `StructureNode`/`DocumentStructure` (Pydantic `BaseModel`s).
 - An alternative, independently-authored package
   (`python-toon`, PyPI `0.1.3`, github.com/xaviviro/python-toon) also exists
   but is not the spec org's own implementation — `toon-format` is the
   stronger choice for that reason.
 
-**Recommendation: migrate to `toon-format`.**
+**Recommendation: migrate to `toon-format` (done).**
 
-The hand-written encoder/decoder is a self-admitted "basic" stand-in with no
-tests, and there's a maintained, spec-authored, tested library that does
-strictly more. This is the clearest hand-rolled-vs-library gap in the
-codebase.
+The hand-written encoder/decoder was a self-admitted "basic" stand-in with
+no tests, and — once the working release was identified — there's a
+maintained, spec-org-authored, well-tested library that does strictly more.
+This migration has been carried out: see `src/parsers/toon_parser.py` and
+`src/transformers/to_toon.py`, both now thin wrappers around
+`toon_format.decode()` / `toon_format.encode()`.
 
-**Rough migration scope (for human review, not performed here):**
-- Replace `TOONTransformer.to_toon(data)` calls (in `src/cli.py`'s `parse`
-  and `convert` commands) with `toon_format.encode(data)` — verify default
-  formatting matches closely enough, or pass `options` to match (current
-  output uses 2-space indent, unquoted simple strings, quoted-on-special-char
-  strings; library equivalents should be checked against
-  `test.json`/`output.toon` in the repo as a regression fixture).
-- Replace `TOONParser._parse_toon(content)` in `src/parsers/toon_parser.py`
-  with `toon_format.decode(content)`, keeping the surrounding
-  `parse()`/`parse_file()` wrapper (BOM handling, wrapping the result in
-  `DocumentStructure`) as-is.
-- Add `toon-format` to `pyproject.toml` dependencies and re-lock.
-- Since there's no test suite yet, this migration is also the natural place
-  to add at least a few regression tests comparing old vs. new output on
-  `test.json` — but per this run's scope, that's a follow-up, not done here.
+**What changed:**
+- `pyproject.toml`: added `toon-format>=0.9.0b1,<1.0.0`.
+- `TOONParser._parse_toon` and all its private helpers (`_parse_lines`,
+  `_parse_tabular_array`, `_parse_simple_array`, `_parse_value`) removed —
+  `TOONParser.parse()` now calls `toon_format.decode()` directly.
+- `TOONTransformer`'s private helpers (`_value_to_toon`, `_array_to_toon`,
+  `_array_tabular`, `_object_to_toon`, `_format_simple_value`) removed —
+  `TOONTransformer.to_toon()` now calls `toon_format.encode()` directly.
+- Public API (`TOONParser.parse`, `TOONParser.parse_file`,
+  `TOONTransformer.to_toon`) unchanged, so `src/cli.py` needed no changes.
+- `output.toon` regenerated from `test.json` via the new encoder as the
+  up-to-date fixture; verified round-trip back to JSON matches the original
+  exactly.
+- Manually smoke-tested every CLI command that touches TOON: `parse
+  --format toon`, `parse <file>.toon --format json`, `schema <file>.toon`,
+  `convert <file> <file>.toon`. There is still no automated test suite —
+  per the earlier scope note, adding one for this code now (rather than
+  after settling on a library) was the right order of operations, and is a
+  natural next step.
 
 ## Candidate 2: hand-written JSON Schema generation from sample data
 
@@ -114,5 +145,5 @@ isn't a self-admitted gap here to close.
 
 | Candidate | Verdict | Library |
 |---|---|---|
-| TOON parser/serializer (`src/parsers/toon_parser.py`, `src/transformers/to_toon.py`) | **Migrate** | [`toon-format`](https://pypi.org/project/toon-format/) |
+| TOON parser/serializer (`src/parsers/toon_parser.py`, `src/transformers/to_toon.py`) | **Migrated** | [`toon-format`](https://pypi.org/project/toon-format/) pinned to `>=0.9.0b1,<1.0.0` (the only functional release; `0.1.0` is a non-functional placeholder) |
 | JSON Schema generation (`src/transformers/to_schema.py`) | Keep hand-written | n/a (`genson` considered, not a fit) |

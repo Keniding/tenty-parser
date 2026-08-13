@@ -1,7 +1,10 @@
 import typer
 import json
+import toon_format
+import yaml
 from importlib.metadata import version as get_version, PackageNotFoundError
 from pathlib import Path
+from typing import Any
 from rich.console import Console
 from rich.syntax import Syntax
 from rich.tree import Tree
@@ -18,6 +21,21 @@ app = typer.Typer(
     help="Parse and transform structured data formats (JSON, YAML, TOON)"
 )
 console = Console()
+
+SUPPORTED_DATA_FORMATS = ("json", "yaml", "toon")
+
+
+def _read_data(path: Path) -> Any:
+    """Lee un archivo JSON/YAML/TOON y retorna su valor Python crudo"""
+    file_ext = path.suffix.lower()
+    # utf-8-sig para manejar BOM en Windows
+    with open(path, 'r', encoding='utf-8-sig') as f:
+        if file_ext in ('.yaml', '.yml'):
+            return yaml.safe_load(f)
+        elif file_ext == '.toon':
+            return toon_format.decode(f.read())
+        else:
+            return json.load(f)
 
 
 @app.command()
@@ -80,14 +98,7 @@ def parse(
             console.print(f"[green]✓[/green] Saved to {output}")
 
     elif format == "toon":
-        # utf-8-sig para manejar BOM
-        with open(file, 'r', encoding='utf-8-sig') as f:
-            if file_ext in ['.yaml', '.yml']:
-                import yaml
-                data = yaml.safe_load(f)
-            else:
-                data = json.load(f)
-
+        data = _read_data(file)
         toon_output = TOONTransformer.to_toon(data)
         syntax = Syntax(toon_output, "yaml", theme="monokai")
         console.print(syntax)
@@ -136,18 +147,15 @@ def convert(
         console.print(f"[red]Error:[/red] File '{input_file}' not found")
         raise typer.Exit(1)
 
+    if to_format not in SUPPORTED_DATA_FORMATS:
+        console.print(f"[red]Error:[/red] Unknown format '{to_format}'")
+        raise typer.Exit(1)
+
     console.print(f"[cyan]Converting:[/cyan] {input_file} → {output_file}")
 
-    # Leer archivo de entrada
+    # Leer archivo de entrada (soporta JSON, YAML y TOON)
     try:
-        file_ext = input_file.suffix.lower()
-        # utf-8-sig para manejar BOM
-        with open(input_file, 'r', encoding='utf-8-sig') as f:
-            if file_ext in ['.yaml', '.yml']:
-                import yaml
-                data = yaml.safe_load(f)
-            else:
-                data = json.load(f)
+        data = _read_data(input_file)
     except Exception as e:
         console.print(f"[red]Error reading file:[/red] {e}")
         raise typer.Exit(1)
@@ -158,14 +166,9 @@ def convert(
             if to_format == "json":
                 json.dump(data, f, indent=2)
             elif to_format == "yaml":
-                import yaml
                 yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
             elif to_format == "toon":
-                toon_output = TOONTransformer.to_toon(data)
-                f.write(toon_output)
-            else:
-                console.print(f"[red]Error:[/red] Unknown format '{to_format}'")
-                raise typer.Exit(1)
+                f.write(TOONTransformer.to_toon(data))
 
         console.print(f"[green]✓[/green] Converted successfully to {to_format.upper()}")
     except Exception as e:
